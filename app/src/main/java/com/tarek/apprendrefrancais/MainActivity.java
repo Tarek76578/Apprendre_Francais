@@ -17,8 +17,13 @@ public class MainActivity extends Activity {
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
+        settings.setAllowFileAccess(true);
+        settings.setAllowContentAccess(true);
+        settings.setBuiltInZoomControls(false);
+        settings.setDisplayZoomControls(false);
 
         webView.setWebViewClient(new WebViewClient());
+
         webView.loadUrl("file:///android_asset/index.html");
 
         setContentView(webView);

@@ -81,6 +81,24 @@ button{border:0;border-radius:12px;padding:12px 16px;font-size:16px;cursor:point
 </div>
 </section>
 
+<section id="ai" class="section">
+<h2>🗣️ أستاذ الفرنسية AI</h2>
+<div class="card">
+<p>تحدث مع أستاذك بالفرنسية، وسيصحح أخطاءك ويشرحها بالعربية.</p>
+<label>مستواك:</label>
+<select id="aiLevel" style="width:100%;padding:12px;margin:8px 0;border-radius:10px">
+<option>A1</option>
+<option>A2</option>
+<option>B1</option>
+<option>B2</option>
+</select>
+<div id="aiChat" style="max-height:400px;overflow:auto;margin:10px 0"></div>
+<input id="aiInput" type="text" placeholder="اكتب بالفرنسية..." style="width:100%;padding:14px;border:1px solid #ddd;border-radius:10px;font-size:16px">
+<button id="aiSend" class="big">إرسال ➤</button>
+<div id="aiStatus" style="text-align:center;color:#777"></div>
+</div>
+</section>
+
 <section id="flashcards" class="section">
 <h2>🃏 البطاقات</h2>
 <div id="flash" class="card flash"></div>
@@ -98,6 +116,7 @@ button{border:0;border-radius:12px;padding:12px 16px;font-size:16px;cursor:point
 <button data-page="phrases">💬<br>عبارات</button>
 <button data-page="quiz">🧠<br>اختبار</button>
 <button data-page="flashcards">🃏<br>بطاقات</button>
+<button data-page="ai">🗣️<br>AI</button>
 </nav>
 
 <script>
@@ -258,6 +277,65 @@ box.appendChild(b);
 
 document.getElementById('startQuiz').addEventListener('click',startQuiz);
 document.getElementById('restartQuiz').addEventListener('click',startQuiz);
+
+
+const aiInput=document.getElementById('aiInput');
+const aiSend=document.getElementById('aiSend');
+const aiChat=document.getElementById('aiChat');
+const aiStatus=document.getElementById('aiStatus');
+
+function addAIMessage(text,me){
+  const d=document.createElement('div');
+  d.className='card';
+  d.style.background=me?'#e5f0ff':'#ffffff';
+  d.style.textAlign=me?'left':'right';
+  d.textContent=text;
+  aiChat.appendChild(d);
+  aiChat.scrollTop=aiChat.scrollHeight;
+}
+
+async function sendAI(){
+  const message=aiInput.value.trim();
+  if(!message)return;
+
+  addAIMessage(message,true);
+  aiInput.value='';
+  aiSend.disabled=true;
+  aiStatus.textContent='جاري التفكير...';
+
+  try{
+    const response=await fetch('http://127.0.0.1:5000/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        message:message,
+        level:document.getElementById('aiLevel').value
+      })
+    });
+
+    const data=await response.json();
+
+    if(data.reply){
+      addAIMessage(data.reply,false);
+    }else{
+      addAIMessage('حدث خطأ في الرد.',false);
+    }
+  }catch(e){
+    addAIMessage('تعذر الاتصال بـ API. تأكد أن Flask يعمل في Termux.',false);
+  }
+
+  aiStatus.textContent='';
+  aiSend.disabled=false;
+}
+
+aiSend.addEventListener('click',sendAI);
+
+aiInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){
+    e.preventDefault();
+    sendAI();
+  }
+});
 
 let fc=0,flipped=false,known=new Set();
 

@@ -596,7 +596,15 @@ button, [role="button"], .bottom-btn, .filter-btn, .big-btn, .fc-btn, .flashcard
       else if (a === "next") nextCard();
       else if (a === "nav") goTo(el.dataset.sec);
     });
-    init();
+    document.addEventListener("DOMContentLoaded", function() {
+      document.querySelectorAll("[data-action=\"filter\"]").forEach(function(b) { b.addEventListener("click", function() { filterVocab(b.dataset.cat, b); }); });
+      document.querySelectorAll("[data-action=\"quiz\"]").forEach(function(b) { b.addEventListener("click", startQuiz); });
+      document.querySelectorAll("[data-action=\"flip\"]").forEach(function(b) { b.addEventListener("click", flipCard); });
+      document.querySelectorAll("[data-action=\"prev\"]").forEach(function(b) { b.addEventListener("click", prevCard); });
+      document.querySelectorAll("[data-action=\"next\"]").forEach(function(b) { b.addEventListener("click", nextCard); });
+      document.querySelectorAll("[data-action=\"known\"]").forEach(function(b) { b.addEventListener("click", markKnown); });
+      document.querySelectorAll("[data-action=\"nav\"]").forEach(function(b) { b.addEventListener("click", function() { goTo(b.dataset.sec); }); });
+    });
   </script>
 </body>
 </html>

@@ -289,7 +289,25 @@ function addAIMessage(text,me){
   d.className='card';
   d.style.background=me?'#e5f0ff':'#ffffff';
   d.style.textAlign=me?'left':'right';
-  d.textContent=text;
+
+  const t=document.createElement('div');
+  t.textContent=text;
+  d.appendChild(t);
+
+  if(!me){
+    const b=document.createElement('button');
+    b.textContent='🔊 استمع';
+    b.style.marginTop='10px';
+    b.style.padding='8px 14px';
+    b.style.borderRadius='10px';
+    b.style.border='none';
+    b.style.cursor='pointer';
+    b.onclick=function(){
+      speak(text);
+    };
+    d.appendChild(b);
+  }
+
   aiChat.appendChild(d);
   aiChat.scrollTop=aiChat.scrollHeight;
 }

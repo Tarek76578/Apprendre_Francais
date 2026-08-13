@@ -207,12 +207,12 @@
   <!-- Sections -->
   <div id="sec-vocab" class="section section-active">
     <div class="filter-row">
-      <button class="filter-btn f-active" onclick="filterVocab('all',this)">الكل</button>
-      <button class="filter-btn f-inactive" onclick="filterVocab('greetings',this)">تحيات</button>
-      <button class="filter-btn f-inactive" onclick="filterVocab('numbers',this)">أرقام</button>
-      <button class="filter-btn f-inactive" onclick="filterVocab('food',this)">طعام</button>
-      <button class="filter-btn f-inactive" onclick="filterVocab('family',this)">عائلة</button>
-      <button class="filter-btn f-inactive" onclick="filterVocab('days',this)">أيام</button>
+      <button class="filter-btn f-active" data-action="filter" data-cat="all">الكل</button>
+      <button class="filter-btn f-inactive" data-action="filter" data-cat="greetings">تحيات</button>
+      <button class="filter-btn f-inactive" data-action="filter" data-cat="numbers">أرقام</button>
+      <button class="filter-btn f-inactive" data-action="filter" data-cat="food">طعام</button>
+      <button class="filter-btn f-inactive" data-action="filter" data-cat="family">عائلة</button>
+      <button class="filter-btn f-inactive" data-action="filter" data-cat="days">أيام</button>
     </div>
     <div id="vocab-list"></div>
   </div>
@@ -226,7 +226,7 @@
       <div style="font-size: 48px; margin-bottom: 10px;">🎯</div>
       <h2 style="font-size: 18px; margin-bottom: 4px;">اختبر معلوماتك</h2>
       <p style="color: #a0b4c8; margin-bottom: 18px; font-size: 13px;">10 أسئلة — هل أنت مستعد؟</p>
-      <button class="big-btn" onclick="startQuiz()">ابدأ الاختبار</button>
+      <button class="big-btn" data-action="quiz">ابدأ الاختبار</button>
     </div>
     <div id="quiz-play" style="display:none;">
       <div class="quiz-box">
@@ -243,23 +243,23 @@
       <div class="result-emoji">🏆</div>
       <div class="result-score">نتيجتك: <span id="final-score">0</span>/10</div>
       <div class="result-msg" id="result-msg"></div>
-      <button class="big-btn" onclick="startQuiz()">إعادة المحاولة</button>
+      <button class="big-btn" data-action="quiz">إعادة المحاولة</button>
     </div>
   </div>
 
   <div id="sec-flashcards" class="section">
     <div class="flashcard-wrap">
       <div style="margin-bottom:8px; font-size:11px; color:#8899aa;">بطاقة <span id="fc-current">1</span> من <span id="fc-total">24</span></div>
-      <div class="flashcard" onclick="flipCard()">
+      <div class="flashcard" data-action="flip">
         <div class="fc-hint">انقر للقلب ↻</div>
         <div class="fc-front" id="fc-front"></div>
         <div class="fc-back" id="fc-back" style="display:none;"></div>
         <div class="fc-pron" id="fc-pron" style="display:none;"></div>
       </div>
       <div class="fc-controls">
-        <button class="fc-btn fc-btn-prev" onclick="prevCard()">← السابق</button>
-        <button class="fc-btn fc-btn-know" onclick="markKnown()">✓ عرفتها</button>
-        <button class="fc-btn fc-btn-next" onclick="nextCard()">التالي →</button>
+        <button class="fc-btn fc-btn-prev" data-action="prev">← السابق</button>
+        <button class="fc-btn fc-btn-know" data-action="known">✓ عرفتها</button>
+        <button class="fc-btn fc-btn-next" data-action="next">التالي →</button>
       </div>
       <p style="margin-top:10px; color:#8899aa; font-size:11px;">البطاقات المتعلمة: <span id="fc-known" style="color:#2ecc71; font-weight:700;">0</span></p>
     </div>
@@ -267,19 +267,19 @@
 
   <!-- Bottom Navigation -->
   <div class="bottom-nav">
-    <button class="bottom-btn active" onclick="goTo('vocab')">
+    <button class="bottom-btn active" data-action="nav" data-sec="vocab">
       <span class="icon">📚</span>
       <span>مفردات</span>
     </button>
-    <button class="bottom-btn" onclick="goTo('phrases')">
+    <button class="bottom-btn" data-action="nav" data-sec="phrases">
       <span class="icon">💬</span>
       <span>عبارات</span>
     </button>
-    <button class="bottom-btn" onclick="goTo('quiz')">
+    <button class="bottom-btn" data-action="nav" data-sec="quiz">
       <span class="icon">❓</span>
       <span>اختبار</span>
     </button>
-    <button class="bottom-btn" onclick="goTo('flashcards')">
+    <button class="bottom-btn" data-action="nav" data-sec="flashcards">
       <span class="icon">🔄</span>
       <span>بطاقات</span>
     </button>
@@ -582,6 +582,18 @@
       document.getElementById('progress-text').textContent = pct + '%';
     }
 
+    document.addEventListener("click", function(e) {
+      const el = e.target.closest("[data-action]");
+      if (!el) return;
+      const a = el.dataset.action;
+      if (a === "filter") filterVocab(el.dataset.cat, el);
+      else if (a === "quiz") startQuiz();
+      else if (a === "flip") flipCard();
+      else if (a === "prev") prevCard();
+      else if (a === "known") markKnown();
+      else if (a === "next") nextCard();
+      else if (a === "nav") goTo(el.dataset.sec);
+    });
     init();
   </script>
 </body>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1e3a5f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Apprendre le Français - تعلم الفرنسية</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body { 
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+      background: linear-gradient(180deg, #1e3a5f 0%, #0d1b2a 100%); 
+      color: #fff; 
+      min-height: 100vh;
+      overflow-x: hidden;
+      padding-bottom: 80px;
+    }
+    .app-header { 
+      text-align: center; 
+      padding: 20px 16px 10px; 
+      position: sticky; 
+      top: 0; 
+      background: rgba(30,58,95,0.95); 
+      backdrop-filter: blur(10px);
+      z-index: 100;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .app-header .flag { font-size: 36px; margin-bottom: 2px; }
+    .app-header h1 { font-size: 20px; font-weight: 700; color: #f4a261; }
+    .app-header p { color: #a0b4c8; font-size: 12px; margin-top: 2px; }
+
+    .progress-wrap { max-width: 260px; margin: 8px auto 0; }
+    .progress-bar { background: #0d1b2a; border-radius: 10px; height: 5px; overflow: hidden; }
+    .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #f4a261, #e76f51); border-radius: 10px; transition: width 0.5s; }
+    .progress-text { font-size: 10px; color: #8899aa; margin-top: 3px; }
+
+    .section { display: none; max-width: 600px; margin: 0 auto; padding: 0 12px; animation: fadeIn 0.3s; }
+    .section-active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .filter-row { display: flex; gap: 6px; margin: 12px 0; overflow-x: auto; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
+    .filter-row::-webkit-scrollbar { display: none; }
+    .filter-btn { border: none; cursor: pointer; font-size: 11px; font-weight: 600; padding: 6px 12px; border-radius: 16px; flex-shrink: 0; transition: all 0.2s; }
+    .f-active { background: #f4a261; color: #1e3a5f; }
+    .f-inactive { background: #0d1b2a; color: #a0b4c8; }
+
+    .word-card {
+      background: #0d1b2a;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      border-right: 3px solid #f4a261;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.1s;
+    }
+    .word-card:active { transform: scale(0.98); }
+    .w-fr { font-size: 17px; font-weight: 700; color: #fff; }
+    .w-pron { font-size: 11px; color: #8899aa; margin-top: 2px; }
+    .w-ar { font-size: 14px; color: #f4a261; font-weight: 600; text-align: left; }
+    .speaker { font-size: 18px; margin-right: 8px; cursor: pointer; opacity: 0.7; }
+    .speaker:active { opacity: 1; transform: scale(1.2); }
+
+    .phrase-card {
+      background: #0d1b2a;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      border-right: 3px solid #e76f51;
+    }
+    .p-fr { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .p-pron { font-size: 11px; color: #8899aa; margin-bottom: 4px; }
+    .p-ar { font-size: 13px; color: #f4a261; font-weight: 600; }
+
+    .quiz-box {
+      background: #0d1b2a;
+      border-radius: 16px;
+      padding: 18px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .quiz-question { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .quiz-sub { color: #a0b4c8; font-size: 12px; }
+    .quiz-opt {
+      width: 100%;
+      border: none;
+      background: #1e3a5f;
+      color: #fff;
+      padding: 13px;
+      border-radius: 12px;
+      margin-bottom: 7px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .quiz-opt:active { transform: scale(0.97); }
+    .opt-correct { background: #2ecc71 !important; }
+    .opt-wrong { background: #e76f51 !important; }
+
+    .flashcard-wrap { text-align: center; padding: 0 16px; }
+    .flashcard {
+      background: linear-gradient(135deg, #1e3a5f, #0d1b2a);
+      border-radius: 20px;
+      padding: 44px 18px;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid #f4a261;
+      transition: all 0.3s;
+      user-select: none;
+      position: relative;
+    }
+    .flashcard:active { transform: scale(0.97); }
+    .fc-hint { position: absolute; top: 8px; right: 12px; font-size: 10px; color: #f4a261; }
+    .fc-front { font-size: 26px; font-weight: 700; }
+    .fc-back { font-size: 20px; color: #f4a261; font-weight: 600; }
+    .fc-pron { margin-top: 6px; color: #8899aa; font-size: 12px; font-style: italic; }
+
+    .fc-controls { display: flex; justify-content: center; gap: 8px; margin-top: 14px; }
+    .fc-btn { border: none; padding: 9px 16px; border-radius: 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+    .fc-btn-prev { background: #1e3a5f; color: #fff; }
+    .fc-btn-know { background: #2ecc71; color: #fff; }
+    .fc-btn-next { background: #1e3a5f; color: #fff; }
+
+    .center-box { text-align: center; padding: 36px 16px; }
+    .big-btn {
+      background: linear-gradient(135deg, #f4a261, #e76f51);
+      color: #fff;
+      border: none;
+      padding: 13px 32px;
+      border-radius: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .big-btn:active { transform: scale(0.96); }
+
+    .result-emoji { font-size: 48px; margin-bottom: 10px; }
+    .result-score { font-size: 18px; color: #f4a261; font-weight: 700; margin-bottom: 4px; }
+    .result-msg { color: #a0b4c8; margin-bottom: 18px; font-size: 13px; }
+
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(13,27,42,0.98);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex;
+      justify-content: space-around;
+      padding: 6px 0;
+      z-index: 100;
+    }
+    .bottom-btn {
+      background: none;
+      border: none;
+      color: #8899aa;
+      font-size: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1px;
+      cursor: pointer;
+      padding: 4px 10px;
+    }
+    .bottom-btn .icon { font-size: 18px; }
+    .bottom-btn.active { color: #f4a261; }
+
+    .toast {
+      position: fixed;
+      bottom: 90px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f4a261;
+      color: #1e3a5f;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 200;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="app-header">
+    <div class="flag">🇫🇷</div>
+    <h1>Apprendre le Français</h1>
+    <p>تعلم الفرنسية من الصفر</p>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" id="main-progress"></div></div>
+      <div class="progress-text">التقدم: <span id="progress-text">0%</span></div>
+    </div>
+  </div>
+
+  <!-- Sections -->
+  <div id="sec-vocab" class="section section-active">
+    <div class="filter-row">
+      <button class="filter-btn f-active" onclick="filterVocab('all',this)">الكل</button>
+      <button class="filter-btn f-inactive" onclick="filterVocab('greetings',this)">تحيات</button>
+      <button class="filter-btn f-inactive" onclick="filterVocab('numbers',this)">أرقام</button>
+      <button class="filter-btn f-inactive" onclick="filterVocab('food',this)">طعام</button>
+      <button class="filter-btn f-inactive" onclick="filterVocab('family',this)">عائلة</button>
+      <button class="filter-btn f-inactive" onclick="filterVocab('days',this)">أيام</button>
+    </div>
+    <div id="vocab-list"></div>
+  </div>
+
+  <div id="sec-phrases" class="section">
+    <div id="phrases-list"></div>
+  </div>
+
+  <div id="sec-quiz" class="section">
+    <div id="quiz-start" class="center-box">
+      <div style="font-size: 48px; margin-bottom: 10px;">🎯</div>
+      <h2 style="font-size: 18px; margin-bottom: 4px;">اختبر معلوماتك</h2>
+      <p style="color: #a0b4c8; margin-bottom: 18px; font-size: 13px;">10 أسئلة — هل أنت مستعد؟</p>
+      <button class="big-btn" onclick="startQuiz()">ابدأ الاختبار</button>
+    </div>
+    <div id="quiz-play" style="display:none;">
+      <div class="quiz-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <span style="font-size:10px; color:#8899aa;">السؤال <span id="q-current">1</span>/10</span>
+          <span style="font-size:10px; color:#f4a261; font-weight:700;">النقاط: <span id="q-score">0</span></span>
+        </div>
+        <div class="quiz-question" id="q-text"></div>
+        <div class="quiz-sub" id="q-sub"></div>
+      </div>
+      <div id="q-options"></div>
+    </div>
+    <div id="quiz-result" class="center-box" style="display:none;">
+      <div class="result-emoji">🏆</div>
+      <div class="result-score">نتيجتك: <span id="final-score">0</span>/10</div>
+      <div class="result-msg" id="result-msg"></div>
+      <button class="big-btn" onclick="startQuiz()">إعادة المحاولة</button>
+    </div>
+  </div>
+
+  <div id="sec-flashcards" class="section">
+    <div class="flashcard-wrap">
+      <div style="margin-bottom:8px; font-size:11px; color:#8899aa;">بطاقة <span id="fc-current">1</span> من <span id="fc-total">24</span></div>
+      <div class="flashcard" onclick="flipCard()">
+        <div class="fc-hint">انقر للقلب ↻</div>
+        <div class="fc-front" id="fc-front"></div>
+        <div class="fc-back" id="fc-back" style="display:none;"></div>
+        <div class="fc-pron" id="fc-pron" style="display:none;"></div>
+      </div>
+      <div class="fc-controls">
+        <button class="fc-btn fc-btn-prev" onclick="prevCard()">← السابق</button>
+        <button class="fc-btn fc-btn-know" onclick="markKnown()">✓ عرفتها</button>
+        <button class="fc-btn fc-btn-next" onclick="nextCard()">التالي →</button>
+      </div>
+      <p style="margin-top:10px; color:#8899aa; font-size:11px;">البطاقات المتعلمة: <span id="fc-known" style="color:#2ecc71; font-weight:700;">0</span></p>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div class="bottom-nav">
+    <button class="bottom-btn active" onclick="goTo('vocab')">
+      <span class="icon">📚</span>
+      <span>مفردات</span>
+    </button>
+    <button class="bottom-btn" onclick="goTo('phrases')">
+      <span class="icon">💬</span>
+      <span>عبارات</span>
+    </button>
+    <button class="bottom-btn" onclick="goTo('quiz')">
+      <span class="icon">❓</span>
+      <span>اختبار</span>
+    </button>
+    <button class="bottom-btn" onclick="goTo('flashcards')">
+      <span class="icon">🔄</span>
+      <span>بطاقات</span>
+    </button>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const vocabData = {
+      greetings: [
+        { fr: 'Bonjour', ar: 'صباح الخير / مرحباً', pron: 'بونجور' },
+        { fr: 'Bonsoir', ar: 'مساء الخير', pron: 'بونسوار' },
+        { fr: 'Salut', ar: 'مرحباً / وداعاً', pron: 'سالو' },
+        { fr: 'Merci', ar: 'شكراً', pron: 'ميرسي' },
+        { fr: 'S'il vous plaît', ar: 'من فضلك', pron: 'سيل فو بليه' },
+        { fr: 'Excusez-moi', ar: 'عذراً', pron: 'إكسكيوزي موا' },
+        { fr: 'Oui', ar: 'نعم', pron: 'وي' },
+        { fr: 'Non', ar: 'لا', pron: 'نون' },
+        { fr: 'Au revoir', ar: 'إلى اللقاء', pron: 'أو رفوار' },
+        { fr: 'Bienvenue', ar: 'أهلاً وسهلاً', pron: 'بيانفنو' },
+      ],
+      numbers: [
+        { fr: 'Un', ar: 'واحد', pron: 'أن' },
+        { fr: 'Deux', ar: 'اثنان', pron: 'دو' },
+        { fr: 'Trois', ar: 'ثلاثة', pron: 'تروا' },
+        { fr: 'Quatre', ar: 'أربعة', pron: 'كاتر' },
+        { fr: 'Cinq', ar: 'خمسة', pron: 'سانك' },
+        { fr: 'Six', ar: 'ستة', pron: 'سيس' },
+        { fr: 'Sept', ar: 'سبعة', pron: 'سيت' },
+        { fr: 'Huit', ar: 'ثمانية', pron: 'ويت' },
+        { fr: 'Neuf', ar: 'تسعة', pron: 'نوف' },
+        { fr: 'Dix', ar: 'عشرة', pron: 'ديس' },
+      ],
+      food: [
+        { fr: 'Pain', ar: 'خبز', pron: 'بان' },
+        { fr: 'Eau', ar: 'ماء', pron: 'أو' },
+        { fr: 'Café', ar: 'قهوة', pron: 'كافيه' },
+        { fr: 'Pomme', ar: 'تفاحة', pron: 'بوم' },
+        { fr: 'Lait', ar: 'حليب', pron: 'ليه' },
+        { fr: 'Viande', ar: 'لحم', pron: 'فياند' },
+        { fr: 'Légumes', ar: 'خضار', pron: 'ليجوم' },
+        { fr: 'Gâteau', ar: 'كعكة', pron: 'جاتو' },
+        { fr: 'Fromage', ar: 'جبن', pron: 'فروماج' },
+        { fr: 'Poisson', ar: 'سمك', pron: 'بواسون' },
+      ],
+      family: [
+        { fr: 'Mère', ar: 'أم', pron: 'مير' },
+        { fr: 'Père', ar: 'أب', pron: 'بير' },
+        { fr: 'Sœur', ar: 'أخت', pron: 'سور' },
+        { fr: 'Frère', ar: 'أخ', pron: 'فرير' },
+        { fr: 'Enfant', ar: 'طفل', pron: 'أنفان' },
+        { fr: 'Ami', ar: 'صديق', pron: 'أمي' },
+        { fr: 'Femme', ar: 'امرأة / زوجة', pron: 'فام' },
+        { fr: 'Homme', ar: 'رجل / زوج', pron: 'أوم' },
+      ],
+      days: [
+        { fr: 'Lundi', ar: 'الإثنين', pron: 'لوندي' },
+        { fr: 'Mardi', ar: 'الثلاثاء', pron: 'ماردي' },
+        { fr: 'Mercredi', ar: 'الأربعاء', pron: 'ميركردي' },
+        { fr: 'Jeudi', ar: 'الخميس', pron: 'جودي' },
+        { fr: 'Vendredi', ar: 'الجمعة', pron: 'فوندردي' },
+        { fr: 'Samedi', ar: 'السبت', pron: 'سامدي' },
+        { fr: 'Dimanche', ar: 'الأحد', pron: 'ديمونش' },
+      ],
+    };
+
+    const phrases = [
+      { fr: 'Comment allez-vous ?', ar: 'كيف حالك؟', pron: 'كومون أليه فو؟' },
+      { fr: 'Je vais bien, merci.', ar: 'أنا بخير، شكراً.', pron: 'جو في بيان، ميرسي.' },
+      { fr: 'Comment vous appelez-vous ?', ar: 'ما اسمك؟', pron: 'كومون فو أبيليه فو؟' },
+      { fr: 'Je m'appelle...', ar: 'اسمي...', pron: 'جو مابيل...' },
+      { fr: 'D'où venez-vous ?', ar: 'من أين أنت؟', pron: 'دو فونيه فو؟' },
+      { fr: 'Je viens de...', ar: 'أنا من...', pron: 'جو فيان دو...' },
+      { fr: 'Je ne comprends pas.', ar: 'لا أفهم.', pron: 'جو نو كومبرون با.' },
+      { fr: 'Parlez plus lentement.', ar: 'تحدث ببطء.', pron: 'بارليه بلي لانتمو.' },
+      { fr: 'Où est... ?', ar: 'أين...؟', pron: 'أو إيه...؟' },
+      { fr: 'Combien ça coûte ?', ar: 'كم سعر هذا؟', pron: 'كومبيان سا كوت؟' },
+      { fr: 'Je voudrais...', ar: 'أريد...', pron: 'جو فودري...' },
+      { fr: 'Je ne sais pas.', ar: 'لا أعرف.', pron: 'جو نو سي با.' },
+    ];
+
+    let allVocab = [];
+    Object.values(vocabData).forEach(arr => allVocab.push(...arr));
+    allVocab = allVocab.slice(0, 24);
+
+    let quizQuestions = [], currentQ = 0, quizScore = 0;
+    let fcIndex = 0, fcFlipped = false, knownCards = new Set();
+
+    function init() {
+      renderVocab('all');
+      renderPhrases();
+      renderFlashcard();
+      updateProgress();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 1500);
+    }
+
+    function speak(text) {
+      try {
+        if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+          showToast('التشغيل الصوتي غير متوفر على هذا الجهاز');
+          return;
+        }
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(String(text));
+        u.lang = 'fr-FR';
+        u.rate = 0.85;
+        u.volume = 1;
+        u.pitch = 1;
+        speechSynthesis.speak(u);
+      } catch (e) {
+        showToast('تعذر تشغيل النطق');
+      }
+    }
+
+    function goTo(sec) {
+      document.querySelectorAll('.section').forEach(el => el.classList.remove('section-active'));
+      document.getElementById('sec-' + sec).classList.add('section-active');
+      document.querySelectorAll('.bottom-btn').forEach(el => el.classList.remove('active'));
+      const buttons = document.querySelectorAll('.bottom-btn');
+      const index = ['vocab','phrases','quiz','flashcards'].indexOf(sec);
+      if (index >= 0 && buttons[index]) buttons[index].classList.add('active');
+    }
+
+    function renderVocab(filter) {
+      const list = document.getElementById('vocab-list');
+      let items = [];
+      if (filter === 'all') Object.values(vocabData).forEach(arr => items.push(...arr));
+      else items = vocabData[filter] || [];
+      list.innerHTML = '';
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'word-card';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+
+        const left = document.createElement('div');
+        const fr = document.createElement('div');
+        fr.className = 'w-fr';
+        fr.textContent = item.fr;
+        const pron = document.createElement('div');
+        pron.className = 'w-pron';
+        pron.textContent = item.pron;
+        left.appendChild(fr);
+        left.appendChild(pron);
+
+        const ar = document.createElement('div');
+        ar.className = 'w-ar';
+        ar.textContent = item.ar;
+
+        card.appendChild(left);
+        card.appendChild(ar);
+
+        const play = () => speak(item.fr);
+        card.addEventListener('click', play);
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            play();
+          }
+        });
+        list.appendChild(card);
+      });
+    }
+
+    function filterVocab(cat, btn) {
+      renderVocab(cat);
+      document.querySelectorAll('.filter-btn').forEach(b => { b.classList.remove('f-active'); b.classList.add('f-inactive'); });
+      btn.classList.remove('f-inactive'); btn.classList.add('f-active');
+    }
+
+    function renderPhrases() {
+      const list = document.getElementById('phrases-list');
+      list.innerHTML = '';
+      phrases.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'phrase-card';
+        card.setAttribute('role', 'button');
+        card.setAttribute('tabindex', '0');
+
+        const fr = document.createElement('div');
+        fr.className = 'p-fr';
+        fr.textContent = p.fr;
+        const pron = document.createElement('div');
+        pron.className = 'p-pron';
+        pron.textContent = p.pron;
+        const ar = document.createElement('div');
+        ar.className = 'p-ar';
+        ar.textContent = p.ar;
+
+        card.appendChild(fr);
+        card.appendChild(pron);
+        card.appendChild(ar);
+
+        const play = () => speak(p.fr);
+        card.addEventListener('click', play);
+        card.addEventListener('keydown', e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            play();
+          }
+        });
+        list.appendChild(card);
+      });
+    }
+
+    function startQuiz() {
+      document.getElementById('quiz-start').style.display = 'none';
+      document.getElementById('quiz-result').style.display = 'none';
+      document.getElementById('quiz-play').style.display = 'block';
+      const allWords = [];
+      Object.values(vocabData).forEach(arr => allWords.push(...arr));
+      quizQuestions = [];
+      for (let i = 0; i < 10; i++) {
+        const correct = allWords[Math.floor(Math.random() * allWords.length)];
+        const wrong = [];
+        while (wrong.length < 3) {
+          const w = allWords[Math.floor(Math.random() * allWords.length)];
+          if (w.fr !== correct.fr && !wrong.find(x => x.fr === w.fr)) wrong.push(w);
+        }
+        const options = [correct, ...wrong].sort(() => Math.random() - 0.5);
+        const type = Math.random() > 0.5 ? 'fr-to-ar' : 'ar-to-fr';
+        quizQuestions.push({ correct, options, type });
+      }
+      currentQ = 0; quizScore = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = quizQuestions[currentQ];
+      document.getElementById('q-current').textContent = currentQ + 1;
+      document.getElementById('q-score').textContent = quizScore;
+      document.getElementById('q-text').textContent = q.type === 'fr-to-ar' ? q.correct.fr : q.correct.ar;
+      document.getElementById('q-sub').textContent = q.type === 'fr-to-ar' ? 'ما معنى هذه الكلمة؟' : 'ما هي الكلمة الفرنسية؟';
+      document.getElementById('q-options').innerHTML = q.options.map(opt => {
+        const text = q.type === 'fr-to-ar' ? opt.ar : opt.fr;
+        return `<button class="quiz-opt" onclick="answerQuiz('${opt.fr.replace(/'/g, "\'")}',this)">${text}</button>`;
+      }).join('');
+    }
+
+    function answerQuiz(frWord, btn) {
+      const correct = quizQuestions[currentQ].correct.fr;
+      const opts = document.querySelectorAll('.quiz-opt');
+      opts.forEach(b => {
+        const optFr = quizQuestions[currentQ].options.find(o => (quizQuestions[currentQ].type === 'fr-to-ar' ? o.ar : o.fr) === b.textContent).fr;
+        b.disabled = true;
+        if (optFr === correct) b.classList.add('opt-correct');
+      });
+      if (frWord !== correct) btn.classList.add('opt-wrong');
+      else quizScore++;
+      document.getElementById('q-score').textContent = quizScore;
+      setTimeout(() => {
+        currentQ++;
+        if (currentQ >= 10) showResult();
+        else showQuestion();
+      }, 1000);
+    }
+
+    function showResult() {
+      document.getElementById('quiz-play').style.display = 'none';
+      document.getElementById('quiz-result').style.display = 'block';
+      document.getElementById('final-score').textContent = quizScore;
+      let msg = quizScore >= 8 ? 'ممتاز! أنت تتقدم بسرعة! 🌟' : quizScore >= 5 ? 'جيد! واصل الممارسة! 💪' : 'لا بأس! حاول مرة أخرى! 📚';
+      document.getElementById('result-msg').textContent = msg;
+      updateProgress();
+    }
+
+    function renderFlashcard() {
+      const c = allVocab[fcIndex];
+      document.getElementById('fc-front').textContent = c.fr;
+      document.getElementById('fc-back').textContent = c.ar;
+      document.getElementById('fc-pron').textContent = c.pron;
+      document.getElementById('fc-current').textContent = fcIndex + 1;
+      document.getElementById('fc-total').textContent = allVocab.length;
+      document.getElementById('fc-front').style.display = 'block';
+      document.getElementById('fc-back').style.display = 'none';
+      document.getElementById('fc-pron').style.display = 'none';
+      fcFlipped = false;
+    }
+
+    function flipCard() {
+      fcFlipped = !fcFlipped;
+      document.getElementById('fc-front').style.display = fcFlipped ? 'none' : 'block';
+      document.getElementById('fc-back').style.display = fcFlipped ? 'block' : 'none';
+      document.getElementById('fc-pron').style.display = fcFlipped ? 'block' : 'none';
+    }
+
+    function nextCard() { fcIndex = (fcIndex + 1) % allVocab.length; renderFlashcard(); }
+    function prevCard() { fcIndex = (fcIndex - 1 + allVocab.length) % allVocab.length; renderFlashcard(); }
+    function markKnown() { knownCards.add(fcIndex); document.getElementById('fc-known').textContent = knownCards.size; showToast('✓ أحسنت!'); nextCard(); updateProgress(); }
+
+    function updateProgress() {
+      const pct = Math.round((knownCards.size / allVocab.length) * 100);
+      document.getElementById('main-progress').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = pct + '%';
+    }
+
+    init();
+  </script>
+</body>
+</html>

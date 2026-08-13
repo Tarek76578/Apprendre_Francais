@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebChromeClient;
 
 public class MainActivity extends Activity {
 
@@ -19,10 +20,9 @@ public class MainActivity extends Activity {
         settings.setDomStorageEnabled(true);
         settings.setAllowFileAccess(true);
         settings.setAllowContentAccess(true);
-        settings.setBuiltInZoomControls(false);
-        settings.setDisplayZoomControls(false);
 
         webView.setWebViewClient(new WebViewClient());
+        webView.setWebChromeClient(new WebChromeClient());
 
         webView.loadUrl("file:///android_asset/index.html");
 

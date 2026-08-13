@@ -313,21 +313,30 @@ async function sendAI(){
       })
     });
 
-    const data=await response.json();
+    const raw=await response.text();
+    console.log('AI HTTP:',response.status,raw);
+
+    let data;
+    try{
+      data=JSON.parse(raw);
+    }catch(e){
+      throw new Error('رد غير صالح من API: '+raw);
+    }
 
     if(data.reply){
       addAIMessage(data.reply,false);
     }else{
-      addAIMessage('حدث خطأ في الرد.',false);
+      addAIMessage('API لم يُرجع ردًا: '+raw,false);
     }
+
   }catch(e){
-    addAIMessage('تعذر الاتصال بـ API. تأكد أن Flask يعمل في Termux.',false);
+    console.error('AI ERROR:',e);
+    addAIMessage('خطأ الاتصال: '+e.message,false);
+  }finally{
+    aiStatus.textContent='';
+    aiSend.disabled=false;
   }
-
-  aiStatus.textContent='';
-  aiSend.disabled=false;
 }
-
 aiSend.addEventListener('click',sendAI);
 
 aiInput.addEventListener('keydown',e=>{
